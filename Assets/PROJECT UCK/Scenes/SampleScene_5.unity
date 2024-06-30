@@ -770,6 +770,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myType: 0
+  myValue: 0
+  myFloatValue: 0
+  myBoolValue: 0
+  myDoubleValue: 0
+  myStringValue: 
+  myEnumType: 0
 --- !u!4 &1114535237
 Transform:
   m_ObjectHideFlags: 0
