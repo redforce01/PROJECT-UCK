@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,92 +7,92 @@ namespace UCK
 {
     public class CharacterController : MonoBehaviour
     {
-        public float moveSpeed = 3f;
-        public Transform firePoint;
-        public BulletResourceData bulletResourceData;
+        public float moveSpeed;
+        public float rotationSpeed;
+        public float jumpForce;
 
+        public float groundRadius = 0.1f;
+        public float groundOffset = 0.1f;
+        public LayerMask groundLayer;
 
-        private int selectedBulletIndex = 0;
-        private GameObject currentBulletPrefab;
+        private UnityEngine.CharacterController unityCharacterController;
+
+        private float verticalVelocity; // 수직 속도
+        private bool isGrounded; // 땅에 붙어있는지 여부
+        private float jumpTimeout = 0.1f;
+        private float jumpTimeoutDelta = 0f;
+
+        private void Awake()
+        {
+            unityCharacterController = GetComponent<UnityEngine.CharacterController>();
+        }
+
+        private void Start()
+        {
+            UCKInputSystem.Instance.onJumpCallback += Jump; // Callback 함수에 Chain(체인)을 건다
+                                                            // => Callback 구독한다.
+        }
+
+        private void Jump()
+        {
+            if (isGrounded == false)
+                return;
+
+            verticalVelocity = jumpForce;
+            jumpTimeoutDelta = jumpTimeout;
+        }
 
         private void Update()
         {
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
+            GroundCheck();
+            FreeFall();
 
-            Vector3 direction = new Vector3(horizontal, 0, vertical);
-            transform.Translate(direction * moveSpeed * Time.deltaTime);
+            Vector2 input = UCKInputSystem.Instance.moveInput;
 
-            // 숫자 1번 키를 눌렀을 때 순간 한번만 들어옴
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            float inputRotation = UCKInputSystem.Instance.rotation;
+            float currentRot = transform.rotation.eulerAngles.y;
+            currentRot += (inputRotation * Time.deltaTime * rotationSpeed);
+            transform.rotation = Quaternion.Euler(0, currentRot, 0);
+
+            // transform.right : X축 방향 벡터, input.x : X축 방향 입력값,
+            // transform.forward : Z축 방향 벡터, input.y : Z축 방향 입력값
+            Vector3 finalDirection = (transform.right * input.x) + (transform.forward * input.y);
+            Vector3 movement =
+                (finalDirection * Time.deltaTime * moveSpeed) +     // finalDirection 방향으로 X/Z 축 이동하는 수식
+                (Vector3.up * verticalVelocity * Time.deltaTime);   // 방향으로 Y 축 기준으로 verticalVelocity 이동하는 수식
+
+            unityCharacterController.Move(movement);
+        }
+
+        public void GroundCheck()
+        {
+            // 캐릭터의 발바닥 위치 + Offset 값 만큼 아래쪽 위치를 구해본다.
+            Vector3 spherePosition = transform.position + (Vector3.down * groundOffset);
+
+            // 위에서 구한 위치에 Sphere를 하나 생성해보고, Sphere가 groundLayer 와 충돌하는지 검사한다.
+            isGrounded = Physics.CheckSphere(spherePosition, groundRadius, groundLayer, QueryTriggerInteraction.Ignore);
+        }
+
+        public void FreeFall()
+        {
+            if (isGrounded == false) // 캐릭터가 땅에 있지 않다면 => 수직 속도를 중력 값을 가중시킨다.
             {
-                currentBulletPrefab = bulletResourceData.bulletDatas[0].bulletPrefab;
-                selectedBulletIndex = 0;
+                verticalVelocity += Physics.gravity.y * Time.deltaTime;
             }
-
-            // 숫자 2번 키를 눌렀을 때 순간 한번만 들어옴
-            if (Input.GetKeyDown(KeyCode.Alpha2))
+            else // 땅에 닿아있으니까 수직 속도를 0으로 만든다.
             {
-                currentBulletPrefab = bulletResourceData.bulletDatas[1].bulletPrefab;
-                selectedBulletIndex = 1;
+                // jumpTimeoutDelta 값이 0 보다 크다면 verticalVelocity 를 0으로 만들지 않는다.
+                // Jump 후 일정 시간이 지나면 수직 속도를 0으로 만든다.
+                // jumpTimeoutDelta 값이 0 보다 크다면 => jumpTimeoutDelta 값을 감소시킨다.
+                if (jumpTimeoutDelta > 0)
+                {
+                    jumpTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    verticalVelocity = 0f;
+                }
             }
-
-            // 숫자 3번 키를 눌렀을 때 순간 한번만 들어옴
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                currentBulletPrefab = bulletResourceData.bulletDatas[2].bulletPrefab;
-                selectedBulletIndex = 2;
-            }
-
-            if (Input.GetMouseButton(0))
-            {
-                // To do : Bullet Fire
-                // 1. bulletPrefab을 복제한다
-                // 2. 복제한 오브젝트의 위치/회전 값을 firepoint의 위치/회전 값으로 설정한다.
-                GameObject newBullet = Instantiate(currentBulletPrefab, firePoint.position, firePoint.rotation);
-                Bullet bullet = newBullet.GetComponent<Bullet>();
-                bullet.speed = bulletResourceData.bulletDatas[selectedBulletIndex].speed;
-                Rigidbody bulletRigidbody = newBullet.GetComponent<Rigidbody>();
-                bulletRigidbody.useGravity = bulletResourceData.bulletDatas[selectedBulletIndex].isGravity;
-                Destroy(newBullet.gameObject, bulletResourceData.bulletDatas[selectedBulletIndex].lifeTime);
-            }
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            // Trigger 콜라이더에 처음 닿았을 때, 한 번만 호출
-            Debug.Log("Trigger Enter : " + other.name);
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            // Trigger 콜라이더에 닿아 있는 동안, 계속 호출
-            Debug.Log("Trigger Stay : " + other.name);
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            // Trigger 콜라이더에서 떨어질 때, 한 번만 호출
-            Debug.Log("Trigger Exit : " + other.name);
-        }
-
-        private void OnCollisionEnter(Collision collision)
-        {
-            // Collision 콜라이더에 처음 닿았을 때, 한 번만 호출
-            Debug.Log("Collision Enter : " + collision.gameObject.name);
-        }
-
-        private void OnCollisionStay(Collision collision)
-        {
-            // Collision 콜라이더에 닿아 있는 동안, 계속 호출
-            Debug.Log("Collision Stay : " + collision.gameObject.name);
-        }
-
-        private void OnCollisionExit(Collision collision)
-        {
-            // Collision 콜라이더에서 떨어질 때, 한 번만 호출
-            Debug.Log("Collision Exit : " + collision.gameObject.name);
         }
     }
 }
-
