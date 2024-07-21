@@ -35,14 +35,17 @@ namespace UCK
         #endregion
 
         public Vector2 moveInput;
-
-        public float rotation;
+        public Vector2 look;
+        public bool isStrafe;
+        public bool isWalk;
 
         // Delegate => 함수를 변수처럼 사용할 수 있게 해주는 기능
         public delegate void OnJumpCallback(); // Delegate 선언 => 함수의 형태를 정의
-
         public OnJumpCallback onJumpCallback; // Delegate 변수 선언
 
+        public System.Action onAttack;
+
+        private Vector2 lastMousePosition;
 
         private void Update()
         {
@@ -51,20 +54,9 @@ namespace UCK
 
             moveInput = new Vector2(horizontal, vertical);
 
-            rotation = 0f;
-
-            // Input.GetKey        // Key가 눌러져 있는지 확인
-            // Input.GetKeyDown    // Key가 눌렸는지(1번만) 확인
-            // Input.GetKeyUp      // Key가 눌렀다가 때졌는지(1번만) 확인
-
-            if (Input.GetKey(KeyCode.Q))
-            {
-                rotation -= 1;
-            }
-            if (Input.GetKey(KeyCode.E))
-            {
-                rotation += 1;
-            }
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+            look = new Vector2(mouseX, mouseY);
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
@@ -72,6 +64,23 @@ namespace UCK
                 // => Callback(콜백) 이라는 개념이 이때 등장함
 
                 onJumpCallback();
+            }
+
+            isStrafe = Input.GetMouseButton(1); // 마우스 오른쪽 버튼이 눌러져 있다면 true, 아니면 false
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                isWalk = true;
+            }
+
+            if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                isWalk = false;
+            }
+
+            if (Input.GetMouseButtonDown(0)) // Mouse 왼쪽 버튼이 눌러졌다면
+            {
+                onAttack?.Invoke();
             }
         }
     }
