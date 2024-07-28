@@ -1,3 +1,4 @@
+using Cinemachine.Utility;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,24 @@ namespace UCK
 {
     public class CharacterController : MonoBehaviour
     {
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, checkRadius);
+
+            Gizmos.color = Color.red;
+            for (int i = 0; i < overlappedObjects.Count; i++)
+            {
+                Gizmos.DrawLine(transform.position, overlappedObjects[i].position);
+            }
+        }
+
+        [Header("Overlapped Objects")]
+        public float checkRadius = 5f;
+        public float angleThreshhold = 90f;
+        public List<Transform> overlappedObjects = new List<Transform>();
+        public LayerMask overlapCheckLayers;
+
         public bool IsPossibleMovement { get; set; } = true;
         public bool IsPossibleAttack { get; set; } = true;
 
@@ -31,6 +50,7 @@ namespace UCK
         private float RotationSmoothTime = 0.12f; // RotationSmoothTime 값은 캐릭터의 회전을 부드럽게 처리하기 위한 값이다.
 
         private UnityEngine.CharacterController unityCharacterController;
+        private CharacterBase characterBase;
         private Animator characterAnimator;
 
         private float verticalVelocity; // 수직 속도
@@ -48,6 +68,7 @@ namespace UCK
         {
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
             characterAnimator = GetComponent<Animator>();
+            characterBase = GetComponent<CharacterBase>();
         }
 
         private void Start()
@@ -56,6 +77,13 @@ namespace UCK
                                                             // => Callback 구독한다.
 
             UCKInputSystem.Instance.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
+
+            characterBase.OnChangedHP += OnChangedHP;
+        }
+
+        private void OnChangedHP(float current, float max)
+        {
+            GameHUD_UI.Instance.SetHPValue(current / max);
         }
 
         private void Attack()
@@ -64,6 +92,20 @@ namespace UCK
                 return;
 
             characterAnimator.SetTrigger("AttackTrigger");
+
+            Collider[] overlapped = Physics.OverlapSphere(transform.position, 1f, LayerMask.GetMask("Character"));
+            for (int i = 0; i < overlapped.Length; i++)
+            {
+                Vector3 forward = transform.forward;
+                Vector3 direction = (overlapped[i].transform.position - transform.position).normalized;
+                float dotProduct = Vector3.Dot(forward, direction);
+                float cosAngleThreshold = Mathf.Cos(30f * Mathf.Deg2Rad);
+                if (dotProduct >= cosAngleThreshold)
+                {
+                    CharacterBase character = overlapped[i].GetComponent<CharacterBase>();
+                    character.TakeDamage(10f);
+                }
+            }
         }
 
 
@@ -80,6 +122,42 @@ namespace UCK
 
         private void Update()
         {
+
+            #region 수업 때 배운 OverlapSphere 코드
+            //// Update에서 매 Frame마다 overlappedObjects 리스트를 초기화한다.
+            //overlappedObjects.Clear();
+
+            //// OverlapSphere 함수를 사용하여 Character의 Transform 위치를 기준으로, CheckRadius 만큼의 반경에 있는 Collider를 검출한다.
+            //Collider[] overlapColliders = Physics.OverlapSphere(transform.position, checkRadius, overlapCheckLayers);
+
+            //// 검출된 Collider들을 overlappedObjects 리스트에 추가한다.
+            //for (int i = 0; i < overlapColliders.Length; i++)
+            //{
+            //    // 캐릭터의 앞쪽 방향 벡터
+            //    Vector3 forwardA = transform.forward;
+
+            //    // 캐릭터에서 검사하려는 객체로 향하는 방향 벡터
+            //    Vector3 directionB = (overlapColliders[i].transform.position - transform.position).normalized;
+
+            //    // 두 벡터간의 내적 계산
+            //    float dotProduct = Vector3.Dot(forwardA, directionB);
+
+            //    // 각도 임계값을 코사인 값으로 변환
+            //    float cosAngleThreshold = Mathf.Cos(angleThreshhold * Mathf.Deg2Rad);
+
+            //    // 내적과 코사인 임계값을 비교
+            //    if (dotProduct >= cosAngleThreshold)
+            //    {
+            //        // 여기에 들어왔다는 말은 검사한 오브젝트의 위치가 일정 각도내에 있다는 뜻
+            //        if (overlapColliders[i].gameObject.CompareTag("Enemy"))
+            //        {
+            //            overlappedObjects.Add(overlapColliders[i].transform);
+            //        }
+            //    }
+            //}
+            #endregion
+
+
             GroundCheck();
             FreeFall();
 

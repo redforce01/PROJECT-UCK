@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Room_A
   - Bullet
+  - Enemy
   layers:
   - Default
   - TransparentFX

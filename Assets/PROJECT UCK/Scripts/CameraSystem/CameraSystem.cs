@@ -7,11 +7,9 @@ namespace UCK
     public class CameraSystem : MonoBehaviour
     {
         public static CameraSystem Instance { get; private set; } = null;
+
         public Vector3 AimingTargetPoint { get; protected set; } = Vector3.zero;
-
-
         public LayerMask aimingLayers;
-
         private Camera mainCamera;
 
         private void Awake()
