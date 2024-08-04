@@ -7,77 +7,86 @@ namespace UCK
 {
     public class EnemyController : MonoBehaviour
     {
-        public float explositionRadius = 3f;
-        public float explositionDelayTime = 3f;
-        public bool isExplositionStart = false;
-        public MeshRenderer characterRenderer;
-        public SensorBase sensor;
+        public int attackMotionIndex = 0;
+
+        private CharacterBase characterBase;
+        private SensorBase sensor;
+
+        private CharacterBase targetCharacter = null;
+        private List<CharacterBase> detectedCharacters = new List<CharacterBase>();
+
+        private void Awake()
+        {
+            characterBase = GetComponent<CharacterBase>();
+            sensor = GetComponentInChildren<SensorBase>();
+        }
 
         private void Start()
         {
             sensor.OnDetectedCallback += OnDetected;
             sensor.OnLostSignalCallback += OnLostSignal;
-        }
 
-        private void OnDetected(GameObject gameObject)
-        {
-            ExplositionStart();
-        }
-
-        private void OnLostSignal(GameObject gameObject)
-        {
-            ExplositionStop();
+            Animator animator = GetComponent<Animator>();
+            animator.SetInteger("AttackMotion", attackMotionIndex);
         }
 
         private void Update()
         {
-            if (isExplositionStart)
+            if (characterBase.IsAlive)
             {
-                explositionDelayTime -= Time.deltaTime;
-                if (explositionDelayTime <= 0)
+                if (targetCharacter != null)
                 {
-                    // To do : 주변에 있는 캐릭터를 검사해서. 데미지를 주는 처리
-                    Collider[] overlapped = Physics.OverlapSphere(transform.position, explositionRadius, LayerMask.GetMask("Character"));
-                    for (int i = 0; i < overlapped.Length; i++)
+                    if (targetCharacter.IsAlive)
                     {
-                        CharacterBase character = overlapped[i].GetComponent<CharacterBase>();
-                        if (character != null)
+                        float distance = Vector3.Distance(transform.position, targetCharacter.transform.position);
+                        if (distance < 2f)
                         {
-                            character.TakeDamage(15f);
+                            characterBase.Attack();
+                        }
+                        else
+                        {
+                            Vector3 direction = (targetCharacter.transform.position - transform.position).normalized;
+                            characterBase.Move(new Vector2(direction.x, direction.z), 0);
+                            characterBase.Rotate(targetCharacter.transform.position);
                         }
                     }
+                    else
+                    {
+                        targetCharacter = null;
+                    }
+                }
+                else
+                {
+                    characterBase.Move(Vector2.zero, 0f);
+                }
+            }
+            else
+            {
+                characterBase.Move(Vector2.zero, 0f);
+            }
+        }
 
-                    // 데미지를 주고나서 자기 자신 GameObject는 파괴한다.
-                    Destroy(gameObject);
+        private void OnDetected(GameObject detectedObject)
+        {
+            if (detectedObject.transform.root.TryGetComponent(out CharacterBase character))
+            {
+                detectedCharacters.Add(character);
+                if (targetCharacter == null)
+                {
+                    targetCharacter = character;
                 }
             }
         }
 
-        public void ExplositionStart()
+        private void OnLostSignal(GameObject lostObject)
         {
-            isExplositionStart = true;
-            StartCoroutine(ColorChangeCoroutine());
-        }
-
-        public void ExplositionStop()
-        {
-            isExplositionStart = false;
-            explositionDelayTime = 3f;
-            StopAllCoroutines();
-            characterRenderer.material.color = Color.white;
-        }
-
-        IEnumerator ColorChangeCoroutine()
-        {
-            while (explositionDelayTime > 0)
+            if (lostObject.transform.root.TryGetComponent(out CharacterBase character))
             {
-                characterRenderer.material.color = Color.red;
-
-                yield return new WaitForSeconds(0.1f);
-
-                characterRenderer.material.color = Color.white;
-
-                yield return new WaitForSeconds(0.1f);
+                detectedCharacters.Remove(character);
+                if (targetCharacter == character)
+                {
+                    targetCharacter = null;
+                }
             }
         }
     }

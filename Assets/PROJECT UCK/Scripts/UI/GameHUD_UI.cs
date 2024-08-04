@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,9 @@ namespace UCK
         public Image hpBar;
         public Image spBar;
 
+        public TextMeshProUGUI hpText;
+        public TextMeshProUGUI spText;
+
         private void Awake()
         {
             Instance = this;
@@ -22,14 +26,16 @@ namespace UCK
             Instance = null;
         }
 
-        public void SetHPValue(float value)
+        public void SetHPValue(float current, float max)
         {
-            hpBar.fillAmount = value;
+            hpBar.fillAmount = current / max;
+            hpText.text = string.Format("{0} / {1}", current, max); // {0} {1} : 0번째 인자, 1번째 인자
         }
 
-        public void SetSPValue(float value)
+        public void SetSPValue(float current, float max)
         {
-            spBar.fillAmount = value;
+            spBar.fillAmount = current / max;
+            spText.text = string.Format("{0} / {1}", current, max);
         }
     }
 }

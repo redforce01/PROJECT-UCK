@@ -8,14 +8,14 @@ namespace UCK
     {
         public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            UCK.CharacterController uckCharacterController = animator.GetComponent<UCK.CharacterController>();
+            UCK.CharacterBase uckCharacterController = animator.GetComponent<UCK.CharacterBase>();
             uckCharacterController.IsPossibleMovement = true;
             uckCharacterController.IsPossibleAttack = true;
         }
 
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            UCK.CharacterController uckCharacterController = animator.GetComponent<UCK.CharacterController>();
+            UCK.CharacterBase uckCharacterController = animator.GetComponent<UCK.CharacterBase>();
             uckCharacterController.IsPossibleMovement = false;
             uckCharacterController.IsPossibleAttack = false;
         }
