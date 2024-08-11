@@ -6,6 +6,47 @@ namespace UCK
 {
     public class PlayerCharacter : CharacterBase
     {
+        private InteractionSensor interactionSensor;
+
+        private List<IInteractable> currentInteractionItems = new List<IInteractable>();
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            interactionSensor = GetComponentInChildren<InteractionSensor>();
+            interactionSensor.OnDetected += OnDetectedInteraction;
+            interactionSensor.OnLostSignal += OnLostInteraction;
+        }
+
+        public void Interact()
+        {
+            if (currentInteractionItems.Count <= 0)
+            {
+                return;
+            }
+
+            currentInteractionItems[0].Interact(this);
+            currentInteractionItems.RemoveAt(0);
+        }
+
+        private void OnDetectedInteraction(IInteractable interactable)
+        {
+            if (interactable.IsAutoInteract == true)
+            {
+                interactable.Interact(this);
+            }
+            else
+            {
+                currentInteractionItems.Add(interactable);
+            }
+        }
+
+        private void OnLostInteraction(IInteractable interactable)
+        {
+            currentInteractionItems.Remove(interactable);
+        }
+
         public override void Attack()
         {
             if (IsPossibleAttack == false || IsGrounded == false)

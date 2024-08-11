@@ -25,12 +25,22 @@ namespace UCK
             UCKInputSystem.Instance.onJumpCallback += Jump; // Callback 함수에 Chain(체인)을 건다
                                                             // => Callback 구독한다.
             UCKInputSystem.Instance.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
+            UCKInputSystem.Instance.onInteract += Interact;
 
             characterBase.OnChangedHP += OnChangedHP;
             characterBase.OnChangedSP += OnChangedSP;
 
             OnChangedHP(characterBase.CurrentHP, characterBase.MaxHP);
             OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);
+        }
+
+        private void Interact()
+        {
+            var playerCharacter = characterBase as PlayerCharacter;
+            if (playerCharacter == null)
+                return;
+
+            playerCharacter.Interact();
         }
 
         private void Update()

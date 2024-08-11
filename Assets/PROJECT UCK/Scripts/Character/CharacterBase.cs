@@ -87,7 +87,7 @@ namespace UCK
         private UnityEngine.CharacterController unityCharacterController;
         protected Animator characterAnimator;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             currentHP = maxHP;
             currentSP = maxSP;

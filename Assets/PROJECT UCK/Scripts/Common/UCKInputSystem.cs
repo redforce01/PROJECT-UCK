@@ -44,6 +44,7 @@ namespace UCK
         public OnJumpCallback onJumpCallback; // Delegate 변수 선언
 
         public System.Action onAttack;
+        public System.Action onInteract;
 
         private Vector2 lastMousePosition;
 
@@ -81,6 +82,11 @@ namespace UCK
             if (Input.GetMouseButtonDown(0)) // Mouse 왼쪽 버튼이 눌러졌다면
             {
                 onAttack?.Invoke();
+            }
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                onInteract?.Invoke();
             }
         }
     }
