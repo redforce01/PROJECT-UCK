@@ -7,6 +7,7 @@ namespace UCK
     public class DropItem : MonoBehaviour, IInteractable
     {
         public bool IsAutoInteract => true;
+        public string Message => string.Empty;
 
 
         private Transform followTarget;

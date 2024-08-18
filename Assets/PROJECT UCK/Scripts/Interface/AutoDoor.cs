@@ -7,6 +7,7 @@ namespace UCK
     public class AutoDoor : MonoBehaviour, IInteractable
     {
         public bool IsAutoInteract => true;
+        public string Message => string.Empty;
 
         public float waitTime = 3f;
         public Transform leftDoor;

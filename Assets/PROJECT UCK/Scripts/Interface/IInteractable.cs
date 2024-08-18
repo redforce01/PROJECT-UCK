@@ -7,6 +7,8 @@ namespace UCK
     public interface IInteractable
     {
         public bool IsAutoInteract { get; }
+        public string Message { get; }
+
 
         public void Interact(CharacterBase playerCharacter);
     }

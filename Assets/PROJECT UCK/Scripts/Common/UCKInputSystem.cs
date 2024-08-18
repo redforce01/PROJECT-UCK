@@ -45,6 +45,7 @@ namespace UCK
 
         public System.Action onAttack;
         public System.Action onInteract;
+        public System.Action<float> onMouseWheel;
 
         private Vector2 lastMousePosition;
 
@@ -87,6 +88,16 @@ namespace UCK
             if (Input.GetKeyDown(KeyCode.F))
             {
                 onInteract?.Invoke();
+            }
+
+            float mouseWheel = Input.GetAxis("Mouse ScrollWheel");
+            if (mouseWheel > 0f)
+            {
+                onMouseWheel?.Invoke(mouseWheel);
+            }
+            else if (mouseWheel < 0f)
+            {
+                onMouseWheel?.Invoke(mouseWheel);
             }
         }
     }

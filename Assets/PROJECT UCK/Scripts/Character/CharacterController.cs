@@ -26,12 +26,18 @@ namespace UCK
                                                             // => Callback 구독한다.
             UCKInputSystem.Instance.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
             UCKInputSystem.Instance.onInteract += Interact;
+            UCKInputSystem.Instance.onMouseWheel += OnMouseWheel;
 
             characterBase.OnChangedHP += OnChangedHP;
             characterBase.OnChangedSP += OnChangedSP;
 
             OnChangedHP(characterBase.CurrentHP, characterBase.MaxHP);
             OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);
+        }
+
+        private void OnMouseWheel(float mouseWheel)
+        {
+            Interaction_UI.Instance.ChangeSelection(mouseWheel);
         }
 
         private void Interact()
