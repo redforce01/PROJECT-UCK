@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace UCK
 {
@@ -11,12 +12,16 @@ namespace UCK
 
         private CharacterBase characterBase;
         private SensorBase sensor;
-
         private CharacterBase targetCharacter = null;
         private List<CharacterBase> detectedCharacters = new List<CharacterBase>();
+        private NavMeshAgent navMeshAgent;
 
         private void Awake()
         {
+            navMeshAgent = GetComponent<NavMeshAgent>();
+            //navMeshAgent.updatePosition = false;
+            //navMeshAgent.updateRotation = false;
+
             characterBase = GetComponent<CharacterBase>();
             sensor = GetComponentInChildren<SensorBase>();
         }
@@ -32,37 +37,17 @@ namespace UCK
 
         private void Update()
         {
-            if (characterBase.IsAlive)
+            if (targetCharacter != null)
             {
-                if (targetCharacter != null)
+                float distance = Vector3.Distance(transform.position, targetCharacter.transform.position);
+                if (distance < 2f)
                 {
-                    if (targetCharacter.IsAlive)
-                    {
-                        float distance = Vector3.Distance(transform.position, targetCharacter.transform.position);
-                        if (distance < 2f)
-                        {
-                            characterBase.Attack();
-                        }
-                        else
-                        {
-                            Vector3 direction = (targetCharacter.transform.position - transform.position).normalized;
-                            characterBase.Move(new Vector2(direction.x, direction.z), 0);
-                            characterBase.Rotate(targetCharacter.transform.position);
-                        }
-                    }
-                    else
-                    {
-                        targetCharacter = null;
-                    }
+                    characterBase.Attack();
                 }
                 else
                 {
-                    characterBase.Move(Vector2.zero, 0f);
+                    navMeshAgent.SetDestination(targetCharacter.transform.position);
                 }
-            }
-            else
-            {
-                characterBase.Move(Vector2.zero, 0f);
             }
         }
 
