@@ -38,6 +38,7 @@ namespace UCK
         public Vector2 look;
         public bool isStrafe;
         public bool isWalk;
+        public bool isAim;
 
         // Delegate => 함수를 변수처럼 사용할 수 있게 해주는 기능
         public delegate void OnJumpCallback(); // Delegate 선언 => 함수의 형태를 정의
@@ -69,6 +70,7 @@ namespace UCK
             }
 
             isStrafe = Input.GetMouseButton(1); // 마우스 오른쪽 버튼이 눌러져 있다면 true, 아니면 false
+            isAim = Input.GetMouseButton(1); // 마우스 우 클릭이 눌러져 있다면 isAim을 true 아니면 false
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {

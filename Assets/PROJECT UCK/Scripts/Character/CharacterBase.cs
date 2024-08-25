@@ -4,14 +4,25 @@ using UnityEngine;
 
 namespace UCK
 {
+    [System.Serializable]
+    public class CharacterStats
+    {
+        public float currentHP;
+        public float maxHP;
+        public float currentSP;
+        public float maxSP;
+    }
+
     public class CharacterBase : MonoBehaviour
     {
-        public float CurrentSP => currentSP;
-        public float CurrentHP => currentHP;
-        public float MaxSP => maxSP;
-        public float MaxHP => maxHP;
+        public bool IsAiming { get; set; }
+
+        public float CurrentSP => characterStats.currentSP;
+        public float CurrentHP => characterStats.currentHP;
+        public float MaxSP => characterStats.maxSP;
+        public float MaxHP => characterStats.maxHP;
         public bool IsGrounded => isGrounded;
-        public bool IsAlive => currentHP > 0f;
+        public bool IsAlive => characterStats.currentHP > 0f;
 
         public bool IsPossibleMovement
         {
@@ -44,10 +55,7 @@ namespace UCK
             set => isWalk = value;
         }
 
-        [SerializeField] private float currentHP;
-        [SerializeField] private float maxHP;
-        [SerializeField] private float currentSP;
-        [SerializeField] private float maxSP;
+        public CharacterStats characterStats;
 
         public System.Action<float, float> OnChangedHP;
         public System.Action<float, float> OnChangedSP;
@@ -65,38 +73,38 @@ namespace UCK
         public float groundOffset = 0.1f;
         public LayerMask groundLayer;
 
-        private float verticalVelocity; // 수직 속도
-        private bool isGrounded; // 땅에 붙어있는지 여부
-        private float jumpTimeout = 0.1f;
-        private float jumpTimeoutDelta = 0f;
+        protected float verticalVelocity; // 수직 속도
+        protected bool isGrounded; // 땅에 붙어있는지 여부
+        protected float jumpTimeout = 0.1f;
+        protected float jumpTimeoutDelta = 0f;
 
-        private bool isWalk = false;
-        private bool isStrafe = false;
-        private float speed = 0f;
-        private float targetSpeed = 0f;
-        private float targetSpeedBlend = 0f;
+        protected bool isWalk = false;
+        protected bool isStrafe = false;
+        protected float speed = 0f;
+        protected float targetSpeed = 0f;
+        protected float targetSpeedBlend = 0f;
 
-        private bool isPossibleMovement = false;
-        private bool isPossibleAttack = false;
+        protected bool isPossibleMovement = false;
+        protected bool isPossibleAttack = false;
         protected bool isAttacking = false;
 
-        private float targetRotation;             // targetRotation의 의미는 캐릭터가 바라보아야 하는 방향을 의미한다.
-        private float rotationVelocity;           // rotationVelocity 값은 캐릭터의 회전 속도를 의미한다.
-        private float RotationSmoothTime = 0.12f; // RotationSmoothTime 값은 캐릭터의 회전을 부드럽게 처리하기 위한 값이다.
+        protected float targetRotation;             // targetRotation의 의미는 캐릭터가 바라보아야 하는 방향을 의미한다.
+        protected float rotationVelocity;           // rotationVelocity 값은 캐릭터의 회전 속도를 의미한다.
+        protected float RotationSmoothTime = 0.12f; // RotationSmoothTime 값은 캐릭터의 회전을 부드럽게 처리하기 위한 값이다.
 
-        private UnityEngine.CharacterController unityCharacterController;
+        protected UnityEngine.CharacterController unityCharacterController;
         protected Animator characterAnimator;
 
         protected virtual void Awake()
         {
-            currentHP = maxHP;
-            currentSP = maxSP;
+            characterStats.currentHP = characterStats.maxHP;
+            characterStats.currentSP = characterStats.maxSP;
 
             characterAnimator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (!isAttacking) // 내가 공격중이 아니라면? 
             {
@@ -126,7 +134,12 @@ namespace UCK
 
         public virtual void Attack()
         {
-           
+
+        }
+
+        public virtual void SetAiming(float aiming)
+        {
+
         }
 
         public void Jump()
@@ -142,27 +155,27 @@ namespace UCK
 
         public void IncreaseStamina(float value)
         {
-            currentSP += value;
-            currentSP = Mathf.Clamp(currentSP, 0, maxSP);
+            characterStats.currentSP += value;
+            characterStats.currentSP = Mathf.Clamp(characterStats.currentSP, 0, characterStats.maxSP);
 
-            OnChangedSP?.Invoke(currentSP, maxSP);
+            OnChangedSP?.Invoke(characterStats.currentSP, characterStats.maxSP);
         }
 
         public void DecreaseStamina(float value)
         {
-            currentSP -= value;
-            currentSP = Mathf.Clamp(currentSP, 0, maxSP);
+            characterStats.currentSP -= value;
+            characterStats.currentSP = Mathf.Clamp(characterStats.currentSP, 0, characterStats.maxSP);
 
-            OnChangedSP?.Invoke(currentSP, maxSP);
+            OnChangedSP?.Invoke(characterStats.currentSP, characterStats.maxSP);
         }
 
         public void TakeDamage(float damage)
         {
-            currentHP -= damage;
+            characterStats.currentHP -= damage;
 
-            OnChangedHP?.Invoke(currentHP, maxHP);
+            OnChangedHP?.Invoke(characterStats.currentHP, characterStats.maxHP);
 
-            if (currentHP <= 0)
+            if (characterStats.currentHP <= 0)
             {
                 // 죽는것에 대한 처리
                 // 예) 죽는 모션을 재생한다.

@@ -7,6 +7,7 @@ TagManager:
   - Room_A
   - Bullet
   - Enemy
+  - ActivateTrigger
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - Ground
   - Character
   - InVisible
-  - 
+  - Sensor
   - 
   - 
   - 

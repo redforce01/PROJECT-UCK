@@ -30,7 +30,7 @@ namespace UCK
             newItem.InteractableData = interactionData;
             newItem.Message = interactionData.Message;
             newItem.IsSelected = false;
-            
+
             createdItems.Add(newItem);
 
             if (createdItems.Count == 1)

@@ -9,14 +9,14 @@ namespace UCK
     {
         public Transform cameraPivot;
         public float cameraRotationSpeed = 30f;
-        
+
         private float yaw;                        // yaw 값은 캐릭터의 y축 회전값을 의미한다.
         private float pitch;                      // pitch 값은 캐릭터의 x축 회전값을 의미한다.
 
         private CharacterBase characterBase;
 
         private void Awake()
-        {                   
+        {
             characterBase = GetComponent<CharacterBase>();
         }
 
@@ -60,11 +60,14 @@ namespace UCK
 
                 characterBase.IsStrafe = UCKInputSystem.Instance.isStrafe;
                 characterBase.IsWalk = UCKInputSystem.Instance.isWalk;
+
+                characterBase.IsAiming = UCKInputSystem.Instance.isAim;
             }
             else
             {
                 characterBase.Move(Vector2.zero, Camera.main.transform.rotation.eulerAngles.y);
             }
+
         }
 
         private void LateUpdate()
