@@ -28,6 +28,9 @@ namespace UCK
             UCKInputSystem.Instance.onInteract += Interact;
             UCKInputSystem.Instance.onMouseWheel += OnMouseWheel;
 
+            UCKInputSystem.Instance.onChangeFired += Fire;
+
+
             characterBase.OnChangedHP += OnChangedHP;
             characterBase.OnChangedSP += OnChangedSP;
 
@@ -80,6 +83,11 @@ namespace UCK
         private void Attack()
         {
             characterBase.Attack();
+        }
+
+        private void Fire(bool isFire)
+        {
+            characterBase.Fire(isFire);
         }
 
         private void Jump()

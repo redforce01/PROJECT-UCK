@@ -39,11 +39,13 @@ namespace UCK
         public bool isStrafe;
         public bool isWalk;
         public bool isAim;
+        public bool isFire;
 
         // Delegate => 함수를 변수처럼 사용할 수 있게 해주는 기능
         public delegate void OnJumpCallback(); // Delegate 선언 => 함수의 형태를 정의
         public OnJumpCallback onJumpCallback; // Delegate 변수 선언
 
+        public System.Action<bool> onChangeFired;
         public System.Action onAttack;
         public System.Action onInteract;
         public System.Action<float> onMouseWheel;
@@ -85,6 +87,12 @@ namespace UCK
             if (Input.GetMouseButtonDown(0)) // Mouse 왼쪽 버튼이 눌러졌다면
             {
                 onAttack?.Invoke();
+                onChangeFired?.Invoke(true);
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                onChangeFired?.Invoke(false);
             }
 
             if (Input.GetKeyDown(KeyCode.F))

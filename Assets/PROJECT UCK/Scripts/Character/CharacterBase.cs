@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -104,6 +105,11 @@ namespace UCK
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
         }
 
+        protected virtual void Start()
+        {
+
+        }
+
         protected virtual void Update()
         {
             if (!isAttacking) // 내가 공격중이 아니라면? 
@@ -133,6 +139,11 @@ namespace UCK
         }
 
         public virtual void Attack()
+        {
+
+        }
+
+        public virtual void Fire(bool isFire)
         {
 
         }
@@ -271,6 +282,6 @@ namespace UCK
                     verticalVelocity = 0f;
                 }
             }
-        }
+        }        
     }
 }
