@@ -8,32 +8,8 @@ namespace UCK
     public partial class MyPartialClass { }
 
 
-    public class UCKInputSystem : MonoBehaviour
+    public class UCKInputSystem : SingletonBase<UCKInputSystem>
     {
-        public static UCKInputSystem Instance { get; private set; } = null;
-
-        #region Awake/Destroy
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (Instance == this)
-            {
-                Instance = null;
-            }
-        }
-        #endregion
-
         public Vector2 moveInput;
         public Vector2 look;
         public bool isStrafe;
@@ -49,11 +25,17 @@ namespace UCK
         public System.Action onAttack;
         public System.Action onInteract;
         public System.Action<float> onMouseWheel;
+        public System.Action onTab;
 
         private Vector2 lastMousePosition;
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                onTab?.Invoke();
+            }
+
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
 

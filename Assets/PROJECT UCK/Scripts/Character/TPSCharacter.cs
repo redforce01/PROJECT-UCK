@@ -1,42 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace UCK
 {
     public class TPSCharacter : CharacterBase
     {
-        public Projectile projectilePrefab;
-        public Transform fireStartPoint;
-        public float projectileSpeed = 10f;
-
-        public float fireRate = 0.1f; // 연사 속도 값(초 단위)
-        public int maxAmmo = 30; // 최대 탄환 수(: 1탄창의 총알 수)
+        public WeaponBase primaryWeapon;
+        public WeaponBase secondaryWeapon;
 
         protected float aiming = 0f;
         private float aimingBlend = 0f;
-
         private bool isReloading = false;
-        private bool isFiring = false;
-        private float lastFiredTime = 0f; // 마지막 탄환 발사 시각 값
-        private int currentAmmo = 0; // 현재 탄환 수
+        private WeaponBase currentWeapon = null;
 
         protected override void Start()
         {
-            currentAmmo = maxAmmo;
+            currentWeapon = primaryWeapon;
+            currentWeapon.gameObject.SetActive(true);
+
+            GameHUD_UI.Instance.SetWeaponInfo(
+                currentWeapon.gameObject.name,
+                currentWeapon.CurrentAmmo,
+                currentWeapon.MaxAmmo);
         }
 
         public override void Fire(bool isFire)
         {
-            isFiring = isFire;
-        }
-
-        public void Shoot()
-        {
-            Projectile newBullet = Instantiate(projectilePrefab, fireStartPoint.position, fireStartPoint.rotation);
-            newBullet.gameObject.SetActive(true);
-            newBullet.SetForce(projectileSpeed);
+            currentWeapon.SetFireState(isFire);
         }
 
         public override void SetAiming(float aiming)
@@ -47,6 +38,30 @@ namespace UCK
 
         protected override void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                currentWeapon.gameObject.SetActive(false);
+                currentWeapon = primaryWeapon;
+                currentWeapon.gameObject.SetActive(true);
+
+                GameHUD_UI.Instance.SetWeaponInfo(
+                    currentWeapon.gameObject.name,
+                    currentWeapon.CurrentAmmo,
+                    currentWeapon.MaxAmmo);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                currentWeapon.gameObject.SetActive(false);
+                currentWeapon = secondaryWeapon;
+                currentWeapon.gameObject.SetActive(true);
+
+                GameHUD_UI.Instance.SetWeaponInfo(
+                    currentWeapon.gameObject.name,
+                    currentWeapon.CurrentAmmo,
+                    currentWeapon.MaxAmmo);
+            }
+
             GroundCheck();
             FreeFall();
 
@@ -60,36 +75,28 @@ namespace UCK
 
             characterAnimator.SetFloat("Speed", targetSpeedBlend);
 
-            if (isFiring)
+            if (currentWeapon.CurrentAmmo <= 0)
             {
-                if (Time.time > lastFiredTime + fireRate)
-                {
-                    if (currentAmmo > 0)
-                    {
-                        lastFiredTime = Time.time;
-                        currentAmmo--;
-                        Shoot();
-                    }
-                    else
-                    {
-                        // To do : 재장전
-                        // 재장전 로직 수행하기
-                        // 재장전 애니메이션 호출하기
+                // To do : 재장전
+                // 재장전 로직 수행하기
+                // 재장전 애니메이션 호출하기
 
-                        if (!isReloading)
-                        {
-                            isReloading = true;
-                            characterAnimator.SetTrigger("ReloadTrigger");
-                        }
-                    }
+                if (!isReloading)
+                {
+                    isReloading = true;
+                    characterAnimator.SetTrigger("ReloadTrigger");
                 }
             }
+
+            GameHUD_UI.Instance.SetWeaponAmmo(currentWeapon.CurrentAmmo, currentWeapon.maxAmmo);
         }
 
         public void ReloadComplete()
         {
             isReloading = false;
-            currentAmmo = maxAmmo;
+            currentWeapon.Reload();
+
+            GameHUD_UI.Instance.SetWeaponAmmo(currentWeapon.CurrentAmmo, currentWeapon.maxAmmo);
         }
     }
 }

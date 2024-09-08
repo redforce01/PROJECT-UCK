@@ -22,13 +22,14 @@ namespace UCK
 
         private void Start()
         {
-            UCKInputSystem.Instance.onJumpCallback += Jump; // Callback 함수에 Chain(체인)을 건다
+            UCKInputSystem.Singleton.onJumpCallback += Jump; // Callback 함수에 Chain(체인)을 건다
                                                             // => Callback 구독한다.
-            UCKInputSystem.Instance.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
-            UCKInputSystem.Instance.onInteract += Interact;
-            UCKInputSystem.Instance.onMouseWheel += OnMouseWheel;
+            UCKInputSystem.Singleton.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
+            UCKInputSystem.Singleton.onInteract += Interact;
+            UCKInputSystem.Singleton.onMouseWheel += OnMouseWheel;
+            UCKInputSystem.Singleton.onTab += OnCameraSideChange;
 
-            UCKInputSystem.Instance.onChangeFired += Fire;
+            UCKInputSystem.Singleton.onChangeFired += Fire;
 
 
             characterBase.OnChangedHP += OnChangedHP;
@@ -36,6 +37,14 @@ namespace UCK
 
             OnChangedHP(characterBase.CurrentHP, characterBase.MaxHP);
             OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);
+        }
+
+        private void OnCameraSideChange()
+        {
+            if (characterBase.IsAlive)
+            {
+                CameraSystem.Instance.SetChangeCameraSide();
+            }
         }
 
         private void OnMouseWheel(float mouseWheel)
@@ -54,17 +63,18 @@ namespace UCK
 
         private void Update()
         {
-            Vector2 input = UCKInputSystem.Instance.moveInput;         // - Input System에서 input 값을 가져온다.
+            Vector2 input = UCKInputSystem.Singleton.moveInput;         // - Input System에서 input 값을 가져온다.
             if (characterBase.IsAlive)
             {
                 characterBase.Move(input, Camera.main.transform.rotation.eulerAngles.y); // - Move() 함수로 input 값과, 현재 Main Camera의
                                                                                          //   y 축 값을 전달했음
                 characterBase.Rotate(CameraSystem.Instance.AimingTargetPoint);
 
-                characterBase.IsStrafe = UCKInputSystem.Instance.isStrafe;
-                characterBase.IsWalk = UCKInputSystem.Instance.isWalk;
+                characterBase.IsStrafe = UCKInputSystem.Singleton.isStrafe;
+                characterBase.IsWalk = UCKInputSystem.Singleton.isWalk;
 
-                characterBase.IsAiming = UCKInputSystem.Instance.isAim;
+                characterBase.IsAiming = UCKInputSystem.Singleton.isAim;
+                CameraSystem.Instance.SetActiveAimingCamera(UCKInputSystem.Singleton.isAim);
             }
             else
             {
@@ -75,7 +85,7 @@ namespace UCK
 
         private void LateUpdate()
         {
-            Vector2 look = UCKInputSystem.Instance.look;  // - Input System에서 mouse look 값을 가져온다.
+            Vector2 look = UCKInputSystem.Singleton.look;  // - Input System에서 mouse look 값을 가져온다.
             CameraRotate(look);                           // - CameraRotate() 함수로 mouse look 값을 전달했음
         }
 

@@ -16,6 +16,7 @@ namespace UCK
         public TextMeshProUGUI hpText;
         public TextMeshProUGUI spText;
 
+
         private void Awake()
         {
             Instance = this;
@@ -36,6 +37,20 @@ namespace UCK
         {
             spBar.fillAmount = current / max;
             spText.text = string.Format("{0} / {1}", current, max);
+        }
+
+        public TextMeshProUGUI weaponNameText;
+        public TextMeshProUGUI weaponAmmoText;
+
+        public void SetWeaponInfo(string weaponName, int currentAmmo, int maxAmmo)
+        {
+            weaponNameText.text = weaponName;
+            SetWeaponAmmo(currentAmmo, maxAmmo);
+        }
+
+        public void SetWeaponAmmo(int currentAmmo, int maxAmmo)
+        {
+            weaponAmmoText.text = string.Format("{0} / {1}", currentAmmo, maxAmmo);
         }
     }
 }
