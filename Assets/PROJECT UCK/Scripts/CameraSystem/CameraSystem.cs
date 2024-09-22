@@ -10,20 +10,19 @@ namespace UCK
 
         public static CameraSystem Instance { get; private set; } = null;
 
+        public Camera mainCamera;
         public CinemachineVirtualCamera defaultCamera;
         public CinemachineVirtualCamera aimingCamera;
 
         public Vector3 AimingTargetPoint { get; protected set; } = Vector3.zero;
         public LayerMask aimingLayers;
 
-        private Camera mainCamera;
         private bool isRightCameraSide = false;
         private float cameraSideBlend = 0f;
 
         private void Awake()
         {
             Instance = this;
-            mainCamera = Camera.main;
         }
 
         private void OnDestroy()
