@@ -6,6 +6,15 @@ namespace UCK
 {
     public class TPSCharacter : CharacterBase
     {
+        public void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(primaryWeapon.fireStartPoint.position, aimingTargetPoint.position);
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(primaryWeapon.fireStartPoint.position, primaryWeapon.fireStartPoint.forward.normalized * 10f);
+        }
+
         public WeaponBase primaryWeapon;
         public WeaponBase secondaryWeapon;
 
@@ -13,6 +22,9 @@ namespace UCK
         private float aimingBlend = 0f;
         private bool isReloading = false;
         private WeaponBase currentWeapon = null;
+
+
+        public Transform aimingTargetPoint;
 
         protected override void Start()
         {
@@ -38,6 +50,9 @@ namespace UCK
 
         protected override void Update()
         {
+            aimingTargetPoint.position = CameraSystem.Instance.AimingTargetPoint;
+            currentWeapon.fireStartPoint.forward = aimingTargetPoint.position - currentWeapon.fireStartPoint.position;
+
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 currentWeapon.gameObject.SetActive(false);
