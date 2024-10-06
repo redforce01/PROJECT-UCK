@@ -14,6 +14,8 @@ namespace UCK
         public CinemachineVirtualCamera defaultCamera;
         public CinemachineVirtualCamera aimingCamera;
 
+        public Camera minimapCamera;
+
         public Vector3 AimingTargetPoint { get; protected set; } = Vector3.zero;
         public LayerMask aimingLayers;
 
@@ -32,6 +34,11 @@ namespace UCK
 
         private void Update()
         {
+            Vector3 minimapCameraFollowTargetPosition = CharacterController.Instance.transform.position;
+            minimapCameraFollowTargetPosition.y += 10;
+            minimapCamera.transform.position = minimapCameraFollowTargetPosition;
+
+
             Ray ray = mainCamera.ScreenPointToRay(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f, aimingLayers, QueryTriggerInteraction.Ignore))
             {

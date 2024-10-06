@@ -7,6 +7,8 @@ namespace UCK
 {
     public class CharacterController : MonoBehaviour
     {
+        public static CharacterController Instance;
+
         public Transform cameraPivot;
         public float cameraRotationSpeed = 30f;
 
@@ -17,6 +19,7 @@ namespace UCK
 
         private void Awake()
         {
+            Instance = this;
             characterBase = GetComponent<CharacterBase>();
         }
 
