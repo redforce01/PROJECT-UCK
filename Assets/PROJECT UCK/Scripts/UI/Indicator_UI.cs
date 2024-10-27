@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UCK
 {
-    public class Indicator_UI : MonoBehaviour
+    public class Indicator_UI : UIBase
     {
         public static Indicator_UI Instance { get; private set; }
 

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace UCK
 {
-    public class GameHUD_UI : MonoBehaviour
+    public class GameHUD_UI : UIBase
     {
         public static GameHUD_UI Instance;
 

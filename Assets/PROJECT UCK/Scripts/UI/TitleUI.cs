@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 
 namespace UCK
 {
-    public class TitleUI : MonoBehaviour
+    public class TitleUI : UIBase
     {
         private void Awake()
         {

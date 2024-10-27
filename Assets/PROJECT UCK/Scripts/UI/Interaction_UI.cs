@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UCK
 {
-    public class Interaction_UI : MonoBehaviour
+    public class Interaction_UI : UIBase
     {
         public static Interaction_UI Instance { get; private set; }
 

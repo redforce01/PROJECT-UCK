@@ -25,6 +25,11 @@ namespace UCK
 
         private void Start()
         {
+            UIManager.Show<GameHUD_UI>(UIList.GameHUD_UI);
+            UIManager.Show<Indicator_UI>(UIList.Indicator_UI);
+            UIManager.Show<Interaction_UI>(UIList.Interaction_UI);
+
+
             UCKInputSystem.Singleton.onJumpCallback += Jump; // Callback 함수에 Chain(체인)을 건다
                                                             // => Callback 구독한다.
             UCKInputSystem.Singleton.onAttack += Attack; // InputSystem의 OnAttack 콜백 함수에다가 Chain을 건다.
@@ -39,7 +44,7 @@ namespace UCK
             characterBase.OnChangedSP += OnChangedSP;
 
             OnChangedHP(characterBase.CurrentHP, characterBase.MaxHP);
-            OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);
+            OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);            
         }
 
         private void OnCameraSideChange()

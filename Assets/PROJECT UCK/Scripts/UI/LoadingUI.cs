@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace UCK
 {
-    public class LoadingUI : MonoBehaviour
+    public class LoadingUI : UIBase
     {
         public static LoadingUI Instance { get; private set; }
 
