@@ -46,6 +46,10 @@ namespace UCK
             Projectile newBullet = Instantiate(projectilePrefab, fireStartPoint.position, fireStartPoint.rotation);
             newBullet.gameObject.SetActive(true);
             newBullet.SetForce(bulletSpeed);
+
+            int randomSound = UnityEngine.Random.Range(0, 2);
+            SoundType fireSoundType = randomSound == 0 ? SoundType.Fire_01 : SoundType.Fire_02;
+            SoundSystem.Singleton.PlaySFX(fireSoundType, fireStartPoint.position);
         }
 
         public void SetFireState(bool isFire)

@@ -24,7 +24,7 @@ namespace UCK
         public override IEnumerator SceneEnd()
         {
             // 타이틀 UI를 숨겨준다.
-            UIManager.Hide<TitleUI>(UIList.TitleUI);
+            //UIManager.Hide<TitleUI>(UIList.TitleUI);
 
             AsyncOperation async = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync("TitleScene");
             while(!async.isDone)
