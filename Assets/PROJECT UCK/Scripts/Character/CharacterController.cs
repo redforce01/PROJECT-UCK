@@ -44,7 +44,9 @@ namespace UCK
             characterBase.OnChangedSP += OnChangedSP;
 
             OnChangedHP(characterBase.CurrentHP, characterBase.MaxHP);
-            OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);            
+            OnChangedSP(characterBase.CurrentSP, characterBase.MaxSP);
+                        
+            transform.position = UserDataModel.Singleton.PlayerSessionData.lastPosition;
         }
 
         private void OnCameraSideChange()
@@ -88,7 +90,11 @@ namespace UCK
             {
                 characterBase.Move(Vector2.zero, Camera.main.transform.rotation.eulerAngles.y);
             }
-
+        
+            UserDataModel.Singleton.SetPlayerSessionData(
+                    characterBase.transform.position,
+                    characterBase.CurrentHP,
+                    characterBase.CurrentSP);                
         }
 
         private void LateUpdate()

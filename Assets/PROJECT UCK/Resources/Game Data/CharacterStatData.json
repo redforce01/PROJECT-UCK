@@ -1,0 +1,14 @@
+﻿{
+    "characterStats": [
+        {
+            "level": 1,
+            "moveSpeed": 1.5,
+            "hp": 100.0
+        },
+        {
+            "level": 2,
+            "moveSpeed": 2.0,
+            "hp": 100.0
+        }
+    ]
+}

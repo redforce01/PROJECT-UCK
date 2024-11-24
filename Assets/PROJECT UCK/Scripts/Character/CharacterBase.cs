@@ -282,6 +282,13 @@ namespace UCK
                     verticalVelocity = 0f;
                 }
             }
-        }        
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            unityCharacterController.enabled = false;
+            transform.position = position;
+            unityCharacterController.enabled = true;
+        }
     }
 }
